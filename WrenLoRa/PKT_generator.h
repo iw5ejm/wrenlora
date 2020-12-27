@@ -1,5 +1,4 @@
-//radio module independent
-
+//radio module independent code for the 
 
 void PKTgenerator(){
   oled.clear();

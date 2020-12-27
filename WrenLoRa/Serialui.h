@@ -1,3 +1,5 @@
+//here the serial user interface is managed
+
 bool    sconf = 1; //check if we are in configuration mode to edit the parameters
 char    aChar[4]; //incoming serial buffer
 
@@ -38,9 +40,6 @@ void SerialcurrentSettings(){
     
   Serial.print(F("Role: "));
   Serial.println(ROLEv[ROLE-1]);
-  
-//      sprintf(sentence, "SF=%d CR=%d CRC=%d Power=%d Bandwidth=%u Freq=%u delay between ABP beacons = %u nr of PKTs to send = %u delay between PKTs = %u role = %s", SF,CR,CRC,PWR,BW,FREQ,BCN_DELAY,NPKT,PKT_DELAY,ROLEv[ROLE-1]);
-//      Serial.println(sentence);
 
 }
 

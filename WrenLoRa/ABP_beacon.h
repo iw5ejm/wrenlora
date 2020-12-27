@@ -1,18 +1,3 @@
-//void ABPbeacon() {
-//    oled.clear();
-//    oled.println(F("ABP mode entered\nsuccessfully"));
-//  delay(100);
-//}
-
-//codice per RN2483. Usando questo in caso c'è da modificare solo Radio.h e Receiver per adattarlo all'uso di questo modulo
-//ci sarà da mandare direttamente comandi at per impostare manualmente l'SF BW CR. conviene utilizzare sprintf come nell'rfwx nella comunicazione con
-//il modem aprs.
-//Sketch uses 27902 bytes (90%) of program storage space. Maximum is 30720 bytes.
-//Global variables use 1190 bytes (58%) of dynamic memory, leaving 858 bytes for local variables. Maximum is 2048 bytes.
-
-//code taken from the example of the library https://github.com/jpmeijers/RN2483-Arduino-Library
-//here some more info about practical realization: https://www.thethingsnetwork.org/forum/t/how-to-build-your-first-ttn-node-arduino-rn2483/1574
-
 /*
  * ABP: initABP(String addr, String AppSKey, String NwkSKey);
  * Paste keys from the TTN console here:
@@ -30,13 +15,7 @@ const char *appSKey = "8D7FFEF938589D95AAD928C2E2E7E48F";
 
 
 void ABPinit() {
-  //CHE NE FACCIAMO DELLA SOFTWARE SERIAL PORT SERIAL2RADIO? LA CHIUDIAMO QUANDO? nel loop? perché inoltre converrebbe sostituire il while(1) con
-  //while(ROLE==ABPBEACON) e mettere la funzione che aspetta user input dalla seriale fisica alla fine del main loop
-  //tipo mettere if(Serial.Aviable) sconf=1; e chiamare la funzione SerialUI();
-
-
-
-  //check communication with radio
+  //check communication with radio module
   String hweui = myLora.hweui();
   while(hweui.length() != 16)
   {
@@ -83,7 +62,7 @@ void ABPbeacon() {
   oled.print("   TXing a packet\n     every "); oled.print(BCN_DELAY); oled.println("\"");
   
   while(1){
-    sprintf(sentence, "Hello! ", I); //in case check if myLora.tx wants an array of char with a terminator (i.e. a String..) or not
+    sprintf(sentence, "Hello! ", I); 
     myLora.tx(sentence); //blocking function
     oled.clear(0,128,4,4);
     oled.println(sentence);

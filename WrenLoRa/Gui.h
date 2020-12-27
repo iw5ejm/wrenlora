@@ -1,3 +1,5 @@
+//here the ghaphical user interface is managed
+
 #include <Wire.h>
 #include "SSD1306Ascii.h"
 #include "SSD1306AsciiWire.h"

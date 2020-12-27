@@ -1,11 +1,11 @@
 #include <Arduino.h>
 
-//global variables for settings, stored in flash
+//global variables for LoRaWAN settings, stored in flash
 uint8_t  SF;
 uint8_t  CR;
 uint8_t  CRC;
 uint8_t  PWR;
-uint16_t     BW;
+uint16_t BW;
 long     FREQ;
 uint8_t  ROLE;
 uint16_t BCN_DELAY; //interval between transmission in ABP beacon mode
@@ -23,8 +23,9 @@ uint16_t PKT_DELAY; //interval between transmission in Packet generator mode
 
 void setup() {
   read_settings(); //read saved settings from eeprom
+
+  //initialize OLED display
   Wire.begin();
-  
   oled.begin(&Adafruit128x64, I2C_ADDRESS);
   oled.setFont(System5x7);
   oled.set400kHz();
@@ -33,7 +34,8 @@ void setup() {
   pinMode(UP_btn,  INPUT_PULLUP);
   pinMode(DWN_btn, INPUT_PULLUP);
   pinMode(SW_btn,  INPUT_PULLUP);
-  
+
+  //start serial communication and ask the user to enter the config menu 
   while (!Serial);
   Serial.begin(9600);
   Serial.println(F("\nWrenLoRa field tester 0.9b"));

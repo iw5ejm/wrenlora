@@ -1,3 +1,5 @@
+//"driver" for the radio module: configuration and packet bursts transmission
+
 #include <rn2xx3.h>
 #include <SoftwareSerial.h>
 
