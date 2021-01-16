@@ -11,6 +11,12 @@ uint8_t  ROLE;
 uint16_t BCN_DELAY; //interval between transmission in ABP beacon mode
 uint16_t NPKT;      //number of packets to send in Packet generator mode 
 uint16_t PKT_DELAY; //interval between transmission in Packet generator mode
+bool     PL;
+
+char    payloadA[53]; //buffer for the message in the payload
+char    payloadB[103]; //buffer for the message in the payload
+size_t  PLAlen = 0;
+size_t  PLBlen = 0;
 
 #include "Flash.h"
 #include "Gui.h"

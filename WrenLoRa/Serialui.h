@@ -1,11 +1,13 @@
 //here the serial user interface is managed
 
 bool    sconf = 1; //check if we are in configuration mode to edit the parameters
+bool    PLconf = 1; //check if we have to edit the payload
 char    aChar[4]; //incoming serial buffer
+size_t len = 0;
 
 void aviableCommands(){
   Serial.println(F("\n= Aviable commands: ="));
-  Serial.println(F("h print this menù\nH sHow current settings\nS save settings and quit menu\ns change SF\nc change CR\nC change CRC\np change Power\nb change Bandwidth\nf change Freq\nt change delay between ABP beacons\nn change nr of PKTs to send\ni change delay between PKTs\nr change role\n"));
+  Serial.println(F("h print this menù\nH sHow current settings\nS save settings and quit menu\ns change SF\nc change CR\nC change CRC\np change Power\nb change Bandwidth\nf change Freq\nt change delay between ABP beacons\no change ABP keys\nn change nr of PKTs to send\ni change delay between PKTs\nP edit the payloads\nr change role\n"));
 }
 
 void SerialcurrentSettings(){
@@ -40,6 +42,10 @@ void SerialcurrentSettings(){
     
   Serial.print(F("Role: "));
   Serial.println(ROLEv[ROLE-1]);
+
+  Serial.println(F("Available Payloads: "));
+  Serial.print(F("A: ")); Serial.println(payloadA);
+  Serial.print(F("B: ")); Serial.println(payloadB);
 
 }
 
@@ -83,7 +89,7 @@ void SerialUIedit_settings() {
         Serial.print(F("Bandwidth: ")); Serial.println(BW);       
         break;
 
-        case 'f': //increment Frequence value
+        case 'f': //increment Frequency value
         Iv[5]++;
         if (Iv[5] > DIMv[5]) Iv[5] = 0;
         FREQ = FREQv[Iv[5]];
@@ -97,6 +103,11 @@ void SerialUIedit_settings() {
         Serial.print(F("BCN interval: [seconds]")); Serial.println(BCN_DELAY);       
         break;
 
+        case 'o': //to edit ABP authentication settings change the keys in the sketch in ABP_beacon.h
+        RadioInit(); //called just to print the DEVEUI to register the device in the TTN console
+        Serial.println(F("Register the device in TTN and edit keys in the sketch"));    
+        break;
+        
         case 'n': //increment number of packets sent in PKT generator mode
         Iv[8]++;
         if (Iv[8] > 8) Iv[8] = 1;
@@ -109,6 +120,23 @@ void SerialUIedit_settings() {
         if (Iv[9] > 8) Iv[9] = 1;
         PKT_DELAY = PKT_DELAYv[(Iv[9]-1)];   
         Serial.print(F("PKT interval [ms]: ")); Serial.println(PKT_DELAY);     
+        break;
+
+        case 'P': //edit the payload
+          PLconf=1;
+          Serial.println(F("Enter new payload A (max 50 Byte)"));
+          while(PLconf){
+            while (Serial.available()) {PLAlen = Serial.readBytesUntil('\n', payloadA, 100); PLconf=0;}
+           }
+          PLconf=1;
+          Serial.println(F("Enter new payload B (max 100 Byte)"));
+          while(PLconf){
+            while (Serial.available()) {PLBlen = Serial.readBytesUntil('\n', payloadB, 100); PLconf=0;}
+           }
+          Serial.print(F("\nPayload A is ")); Serial.print(PLAlen); Serial.println(F(" B long plus 3 B for counter and contains:"));
+          Serial.println(payloadA);
+          Serial.print(F("\nPayload B is ")); Serial.print(PLBlen); Serial.println(F(" B long plus 3 B for counter and contains:"));
+          Serial.println(payloadB);
         break;
         
         case 'r': //change role

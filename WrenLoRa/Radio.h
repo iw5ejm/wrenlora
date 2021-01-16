@@ -11,10 +11,10 @@
 //useful variables for at commands
 String str;
 char sentence[150];
-char txpacket[150];
 char band = "L";
 const char radioset[] = "radio set "; 
 const char radiotx[] = "radio tx ";
+String hweui;
 
 
 //create an instance of the rn2xx3 library,
@@ -36,17 +36,17 @@ bool RadioInit() {
   myLora.autobaud();
 
   //check connection with RN2483 module
-  String hweui = myLora.hweui();
+  hweui = myLora.hweui();
   while(hweui.length() != 16)
   { 
     oled.clear();
     oled.println(F("Starting LoRa \nfailed!"));
-    Serial.println(F("Starting LoRa failed!"));
+    Serial.println(F("Starting LoRa module failed!"));
     delay(10000);
     hweui = myLora.hweui();
     
   }
-  
+  Serial.print(F("HWeui is:")); Serial.println(myLora.hweui());
   return 1;
 }
 
@@ -166,7 +166,7 @@ void RadioBurst(uint16_t npkt, uint16_t ms) {
   //enter the burst loop
   while(counter){
 
-    sprintf(sentence, "hello %d",counter);
+    if(PL) sprintf(sentence, "%s %3d", payloadA, counter); else sprintf(sentence, "%s %3d", payloadB, counter); //check if we are using payload A or B and produce the sentence to be encoded
     Serial2Radio.print(F("radio tx ")); Serial2Radio.println(myLora.base16encode(sentence));
     digitalWrite(TXLED, HIGH);
     while(wait_for_txok());

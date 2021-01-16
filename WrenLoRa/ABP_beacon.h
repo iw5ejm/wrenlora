@@ -1,38 +1,32 @@
+//still to be tested
+
+bool join_result = 0;
+
 /*
  * ABP: initABP(String addr, String AppSKey, String NwkSKey);
  * Paste keys from the TTN console here:
  */
-const char *devAddr = "02017201";
-const char *nwkSKey = "AE17E567AECC8787F749A62F5541D522";
-const char *appSKey = "8D7FFEF938589D95AAD928C2E2E7E48F";
+const char *devAddr = "26013F20";
+const char *nwkSKey = "24F0A1FF2BC47B814820FC28B15504C5";
+const char *appSKey = "7119DEDC4AD61CE195EB4741EBB72234";
 
 /*
  * OTAA: initOTAA(String AppEUI, String AppKey);
  * If you are using OTAA, paste the keys from the TTN console here:
  */
-//const char *appEui = "70B3D57ED00001A6";
-//const char *appKey = "A23C96EE13804963F8C2BD6285448198";
+//const char *appEui = "***************";
+//const char *appKey = "***************";
 
 
 void ABPinit() {
   //check communication with radio module
-  String hweui = myLora.hweui();
-  while(hweui.length() != 16)
-  {
-    //Serial.println(F("Communication with RN2xx3 unsuccessful. Power cycle the board."));
-   // Serial.println(hweui);
-    delay(10000);
-    hweui = myLora.hweui();
-  }
-
+  if(RadioInit()) oled.println("LoRa module OK!");
+  
   //print out the HWEUI so that we can register it via ttnctl
-  //Serial.println(F("When using TTN, register this DevEUI: "));
-  //Serial.println(myLora.hweui());
-  //Serial.println(myLora.sysver()); //print RN2483 firmware version
-  oled.println("LoRa module OK!");
+  Serial.println(F("Use the HWeui as DevEUI in the TTN console to register the device"));
+  Serial.println(myLora.sysver()); //print RN2483 firmware version
   
   //configure your keys and join the network
-  bool join_result = false;
   join_result = myLora.initABP(devAddr, appSKey, nwkSKey); //join via ABP
   //join_result = myLora.initOTAA(appEui, appKey);         //join via OTAA
 
@@ -49,7 +43,6 @@ void ABPinit() {
 
 void ABPbeacon() {
   
-  char sentence[35];
   uint16_t I=1;
   
   oled.clear();
@@ -62,12 +55,12 @@ void ABPbeacon() {
   oled.print("   TXing a packet\n     every "); oled.print(BCN_DELAY); oled.println("\"");
   
   while(1){
-    sprintf(sentence, "Hello! ", I); 
+    if(PL) sprintf(sentence, "%s %3d", payloadA, I); else sprintf(sentence, "%s %3d", payloadB, I); 
     myLora.tx(sentence); //blocking function
-    oled.clear(0,128,4,4);
-    oled.println(sentence);
+    oled.clear(15,128,7,7);
+    oled.print(I); oled.println(F(" PKT TXed"));
     I++;
-    delay(BCN_DELAY);    
+    delay(BCN_DELAY*1000L);    
   }
 
 }

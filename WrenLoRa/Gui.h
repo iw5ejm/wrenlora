@@ -1,5 +1,3 @@
-//here the ghaphical user interface is managed
-
 #include <Wire.h>
 #include "SSD1306Ascii.h"
 #include "SSD1306AsciiWire.h"
@@ -18,14 +16,14 @@ bool    gconf = 1; //check if we are in configuration mode to edit the parameter
 bool    pag = 0;   //index for the page
 
 //vectors to store the aviable choices for each parameter
-const uint8_t SFv[] = {7, 8, 9, 10, 11, 12}; //aviable choices for SF
-const uint8_t CRv[] = {5, 6, 7, 8}; //aviable choices for CR..and so on
-const uint8_t CRCv[] = {0, 1};
-const uint8_t PWRv[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
-const uint16_t    BWv[] = {125, 250, 500};
-const long    FREQv[] = {433175000L, 433375000L, 433575000L, 868100000L, 868300000L, 868500000L}; //mandatory first three channel for LoRaWAN EU433 and EU868 
-const uint8_t DIMv[] = {5, 3, 1, 20, 2, 5}; //lengths-1 of each upper vector, used to manage the scroll
-const char    *ROLEv[] = {"PKT GENERATOR", "RECEIVER", "ABP BEACON"};
+const uint8_t  SFv[] = {7, 8, 9, 10, 11, 12}; //aviable choices for SF
+const uint8_t  CRv[] = {5, 6, 7, 8}; //aviable choices for CR..and so on
+const uint8_t  CRCv[] = {0, 1};
+const uint8_t  PWRv[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
+const uint16_t BWv[] = {125, 250, 500};
+const long     FREQv[] = {433175000L, 433375000L, 433575000L, 868100000L, 868300000L, 868500000L}; //mandatory first three channel for LoRaWAN EU433 and EU868 
+const uint8_t  DIMv[] = {5, 3, 1, 20, 2, 5}; //lengths-1 of each upper vector, used to manage the scroll
+const char     *ROLEv[] = {"PKT GENERATOR", "RECEIVER", "ABP BEACON"};
 const uint16_t BCN_DELAYv[] = {1, 3, 5, 10, 20, 60, 300, 600, 900, 1800}; //aviable choice for delay [in seconds] between packets in ABP beacon mode
 const uint16_t PKT_DELAYv[] = {100, 300, 500, 1000, 1500, 2000, 2500, 5000};  //aviable choice for time delay between the transmission of packets
 
@@ -33,6 +31,7 @@ const void *pippo[] = {&SF, &CR, &CRC, &PWR, &BW, &FREQ, &pag}; //an array of po
 const void *pluto[] = {SFv, CRv, CRCv, PWRv, BWv, FREQv}; //an array of pointers to the lists of aviable choice for each LoRa parameter
 
 uint8_t   *b; //support array used in parameters selection
+uint16_t  *bb;
 long      *B; //very long support array
 uint8_t   menuCount = 6; //index for the selected menù
 int8_t    Iv[] = {0, 0, 0, 13, 0, 0, 0, 0, 2, 2}; //index to scroll the aviable choice for each setting
@@ -107,7 +106,7 @@ void menuCheck1() {
     Iv[menuCount]++;
     if (Iv[menuCount] > DIMv[menuCount]) Iv[menuCount] = 0; 
      
-    if (menuCount == 4 || menuCount == 5 ) {//check if we are editing a long or a byte parameter
+    if (menuCount == 5 ) {//check if we are editing a long or a byte parameter
       B=pluto[menuCount];
       *((long*)pippo[menuCount]) = B[Iv[menuCount]];
       oled.println(*((long*)pippo[menuCount]));
@@ -116,7 +115,11 @@ void menuCheck1() {
       delay(100);
       pag=1;
       }
-      
+    else if (menuCount == 4)  {
+      bb=pluto[menuCount];
+      *((uint16_t*)pippo[menuCount]) = bb[Iv[menuCount]];
+      oled.println(*((uint16_t*)pippo[menuCount]));
+      }  
     else {
       b=pluto[menuCount];
       *((uint8_t*)pippo[menuCount]) = b[Iv[menuCount]];
@@ -131,7 +134,7 @@ void menuCheck1() {
     Iv[menuCount]--;
     if (Iv[menuCount] < 0) Iv[menuCount] = DIMv[menuCount];
     
-    if (menuCount == 4 || menuCount == 5 ) {//check if we are editing a long or a byte parameter
+    if (menuCount == 5 ) {//check if we are editing a long or a byte parameter
       B=pluto[menuCount];
       *((long*)pippo[menuCount]) = B[Iv[menuCount]];
       oled.println(*((long*)pippo[menuCount]));
@@ -140,7 +143,11 @@ void menuCheck1() {
       delay(100); //add a little time for more debounce
       pag=1;
       }
-      
+    else if (menuCount == 4)  {
+      bb=pluto[menuCount];
+      *((uint16_t*)pippo[menuCount]) = bb[Iv[menuCount]];
+      oled.println(*((uint16_t*)pippo[menuCount]));
+      }
     else {
       b=pluto[menuCount];
       *((uint8_t*)pippo[menuCount]) = b[Iv[menuCount]];
@@ -161,7 +168,8 @@ void staticMenu2() {
   oled.setCursor(10, 3);
   oled.println( ROLEv[ROLE-1] ); //same thing of the upper line but with the correct dereferencing syntax: in pippo[0] there is a pointer to SF
   if (ROLE == 3) {oled.setCursor(10, 4); oled.print(F("PKT interval: ")); oled.print(BCN_DELAY); oled.println("\"");} //if in beacon mode print the delay between transmissions
-  
+  if (ROLE == 1) {oled.setCursor(10, 4); oled.print(F("Payload: ")); if(PL) oled.print("A"); else oled.print("B");} //if in packet generator mode print the chosen payload (A or B)
+
   oled.setCursor(10, 5);
   oled.print(F("SAVE & EXIT MENU"));
 
@@ -179,7 +187,7 @@ void menuCheck2() {
   if (digitalRead(SW_btn) == BSTATE) {
     oled.clearField(0,menuCount+1,1); //delete the cursor to move on the next lint
 
-    if (ROLE == 3 && menuCount == 2) menuCount=3;
+    if ((ROLE == 3 || ROLE == 1) && menuCount == 2) menuCount=3;
     else if (menuCount == 3) menuCount=4;
     else menuCount=menuCount+2; //update the index of the current active line of the menu
     if (menuCount > 6) menuCount = 2; //we go back on top
@@ -196,12 +204,12 @@ void menuCheck2() {
       if (ROLE > 3) ROLE = 1;
       oled.println( ROLEv[ROLE-1] );
       oled.setCursor(10, 4);
-      if (ROLE == 3) {oled.print(F("PKT interval: ")); oled.println(BCN_DELAY);}
-      else oled.clearToEOL();
-      
+      oled.clearToEOL();
+      if (ROLE == 3) {oled.print(F("PKT interval: ")); oled.print(BCN_DELAY); oled.println("\"");}
+      if (ROLE == 1) {oled.print(F("Payload: ")); if(PL) oled.println("A"); else oled.println("B"); }     
       }
 
-    else if (menuCount == 3) {//change delay between packets in beacon mode
+    else if (menuCount == 3 && ROLE == 3) {//change delay between packets in beacon mode
       oled.setCursor(94, 4);
       oled.clearToEOL();
       Iv[7]++;
@@ -210,6 +218,14 @@ void menuCheck2() {
       oled.print(BCN_DELAY);
       oled.println("\"");
       }
+   
+   else if (menuCount == 3 && ROLE == 1) {//select payload in packet generator mode
+        oled.setCursor(10, 4);
+        oled.clearToEOL();
+        PL=1;
+        oled.print(F("Payload: A"));
+        } 
+    
       
     else if (menuCount == 6) {//change page
       delay(100);
@@ -232,12 +248,12 @@ void menuCheck2() {
         if (ROLE < 1) ROLE = 3;
         oled.println( ROLEv[ROLE-1] );
         oled.setCursor(10, 4);
-        if (ROLE == 3) {oled.print(F("PKT interval:")); oled.println(BCN_DELAY);}
-        else oled.clearToEOL();
-        
+        oled.clearToEOL();
+        if (ROLE == 3) {oled.print(F("PKT interval: ")); oled.print(BCN_DELAY); oled.println("\"");}
+        if (ROLE == 1) {oled.print(F("Payload: ")); if(PL) oled.print("A"); else oled.print("B");}      
         }
         
-      else if (menuCount == 3) {//change delay between packets in beacon mode
+      else if (menuCount == 3 && ROLE == 3) {//change delay between packets in beacon mode
         oled.setCursor(94, 4);
         oled.clearToEOL();
         Iv[7]--;
@@ -245,6 +261,13 @@ void menuCheck2() {
         BCN_DELAY=BCN_DELAYv[(Iv[7]-1)];
         oled.print(BCN_DELAY);
         oled.println("\"");
+        }
+      
+      else if (menuCount == 3 && ROLE == 1) {//select payload in packet generator mode
+        oled.setCursor(10, 4);
+        oled.clearToEOL();
+        PL=0;
+        oled.print(F("Payload: B"));
         }
  
       else if (menuCount == 6) {//change page
