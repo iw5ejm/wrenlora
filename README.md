@@ -1,5 +1,1 @@
-# WrenLoRa
-Yet another stand-alone LoRaWAN tester, with on-the-fly setting of SF/CR/BW/PWR and frequency.
-Stand alone operation through graphical user interface, Microchip RN2483 based.
-A version with only serial UI is also proposed, working with the cheaper RFM95W and RA-02 LoRa radio modules.
-
+<html><head><meta content="text/html; charset=ISO-8859-1"http-equiv="content-type"><title></title></head><body><big style="font-style: italic;">Yet another stand-alone LoRaWANtester, with on-the-fly setting of SF/CR/BW/PWR and frequency.</big><br><br>Stand alone operation through graphical user interface, MicrochipRN2483 based.<br>A version with only serial UI is also proposed, working with thecheaper RFM95W and RA-02 LoRa radio modules.<br><br>The PDF briefly describes the use of the device&nbsp; and the assembly.<br>In the folder “Used Lib” you can find the necessary libraries tocompile the code in Arduino IDE 1.8.12; of course you can findthem&nbsp; also in the authors' GitHub.<br></body></html>
